@@ -172,6 +172,7 @@ svg {
 }
 
 .pet-card {
+  position: relative;
   width: min(100%, 1120px);
   height: clamp(390px, calc(100dvh - 285px), 680px);
   display: grid;
@@ -183,6 +184,75 @@ svg {
   border-radius: 8px;
   box-shadow: 0 18px 50px rgb(41 50 56 / 10%);
   touch-action: pan-y;
+}
+
+.pet-deck {
+  width: min(100%, 1120px);
+  display: grid;
+  margin: 0 auto;
+  isolation: isolate;
+}
+
+.pet-deck > .pet-card {
+  width: 100%;
+  grid-area: 1 / 1;
+}
+
+.pet-card--active {
+  z-index: 2;
+  cursor: grab;
+  user-select: none;
+  will-change: transform;
+  transition: transform 220ms cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.pet-card--active.is-dragging {
+  cursor: grabbing;
+  transition: none;
+}
+
+.pet-card--active.is-exiting {
+  pointer-events: none;
+  transition-duration: 240ms;
+}
+
+.pet-card--preview {
+  z-index: 1;
+  pointer-events: none;
+}
+
+.pet-card__swipe-label {
+  position: absolute;
+  top: 28px;
+  z-index: 5;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 9px 12px;
+  background: rgb(255 255 255 / 92%);
+  border: 2px solid currentColor;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  pointer-events: none;
+}
+
+.pet-card__swipe-label svg {
+  width: 19px;
+  height: 19px;
+}
+
+.pet-card__swipe-label--skip {
+  right: 28px;
+  color: var(--color-secondary);
+  transform: rotate(6deg);
+}
+
+.pet-card__swipe-label--favorite {
+  left: 28px;
+  color: var(--color-primary);
+  transform: rotate(-6deg);
 }
 
 .pet-card__image-wrapper {
@@ -198,6 +268,8 @@ svg {
   height: 100%;
   display: block;
   object-fit: cover;
+  -webkit-user-drag: none;
+  user-select: none;
 }
 
 .pet-card__organization {
@@ -595,11 +667,11 @@ svg {
   }
 
   .app-content {
-    padding: 24px 0 176px;
+    padding: 8px 0 12px;
   }
 
   .discovery-count {
-    margin-top: 24px;
+    margin: 0 0 8px;
   }
 
   .pet-card__image-wrapper {
@@ -671,7 +743,7 @@ svg {
 
 @media (max-width: 760px) {
   .app-content {
-    padding-bottom: 176px;
+    padding-bottom: 12px;
   }
 
   .pet-card {
@@ -690,11 +762,13 @@ svg {
   }
 
   .match-actions {
-    position: static;
+    position: sticky;
+    bottom: 70px;
+    z-index: 20;
     width: fit-content;
     padding: 8px 14px;
     gap: 32px;
-    margin: 16px auto 0;
+    margin: 12px auto 0;
     background: rgb(255 255 255 / 92%);
     border: 1px solid var(--color-border);
     border-radius: 40px;

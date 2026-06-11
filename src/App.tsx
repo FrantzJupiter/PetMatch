@@ -11,6 +11,7 @@ function App() {
   const [activeView, setActiveView] = useState<View>('discovery')
 
   const currentPet = pets[currentPetIndex]
+  const nextPet = pets[(currentPetIndex + 1) % pets.length]
   const favoritePets = pets.filter((pet) => favoritePetIds.includes(pet.id))
   const isCurrentPetFavorite = favoritePetIds.includes(currentPet.id)
 
@@ -69,11 +70,15 @@ function App() {
               {currentPetIndex + 1} de {pets.length} animais disponíveis
             </p>
 
-            <PetCard
-              pet={currentPet}
-              onFavorite={favoriteCurrentPet}
-              onSkip={moveCurrentPetToEnd}
-            />
+            <div className="pet-deck">
+              <PetCard key={`preview-${nextPet.id}`} pet={nextPet} isPreview />
+              <PetCard
+                key={`current-${currentPet.id}`}
+                pet={currentPet}
+                onFavorite={favoriteCurrentPet}
+                onSkip={moveCurrentPetToEnd}
+              />
+            </div>
 
             <div className="match-actions">
               <button

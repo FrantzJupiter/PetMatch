@@ -1,58 +1,143 @@
-import { useRef } from 'react'
-import { HeartPulse } from 'lucide-react'
+import { useRef, useState } from 'react'
+import { Heart, HeartPulse, X } from 'lucide-react'
 import type { Pet } from '../types/pet'
 
 interface PetCardProps {
   pet: Pet
+  isPreview?: boolean
   onFavorite?: () => void
   onSkip?: () => void
 }
 
-const minimumSwipeDistance = 60
+const swipeThreshold = 90
+const exitAnimationDuration = 240
 
-function PetCard({ pet, onFavorite, onSkip }: PetCardProps) {
-  const touchStart = useRef<{ x: number; y: number } | null>(null)
+function PetCard({
+  pet,
+  isPreview = false,
+  onFavorite,
+  onSkip,
+}: PetCardProps) {
+  const pointerStart = useRef<{ x: number; y: number } | null>(null)
+  const isHorizontalGesture = useRef(false)
+  const [dragX, setDragX] = useState(0)
+  const [isDragging, setIsDragging] = useState(false)
+  const [isExiting, setIsExiting] = useState(false)
 
-  function handleTouchStart(event: React.TouchEvent<HTMLElement>) {
-    const touch = event.changedTouches[0]
-    touchStart.current = { x: touch.clientX, y: touch.clientY }
+  function handlePointerDown(event: React.PointerEvent<HTMLElement>) {
+    if (isPreview || isExiting || event.button !== 0) return
+
+    pointerStart.current = { x: event.clientX, y: event.clientY }
+    isHorizontalGesture.current = false
+    setIsDragging(true)
+    event.currentTarget.setPointerCapture(event.pointerId)
   }
 
-  function handleTouchEnd(event: React.TouchEvent<HTMLElement>) {
-    if (!touchStart.current) return
+  function handlePointerMove(event: React.PointerEvent<HTMLElement>) {
+    if (!pointerStart.current || isPreview || isExiting) return
 
-    const touch = event.changedTouches[0]
-    const distanceX = touch.clientX - touchStart.current.x
-    const distanceY = touch.clientY - touchStart.current.y
-
-    touchStart.current = null
+    const distanceX = event.clientX - pointerStart.current.x
+    const distanceY = event.clientY - pointerStart.current.y
 
     if (
-      Math.abs(distanceX) < minimumSwipeDistance ||
-      Math.abs(distanceX) <= Math.abs(distanceY)
+      !isHorizontalGesture.current &&
+      Math.abs(distanceY) > Math.abs(distanceX)
     ) {
+      setIsDragging(false)
+      pointerStart.current = null
       return
     }
 
-    if (distanceX > 0) {
-      onFavorite?.()
-      return
+    if (Math.abs(distanceX) > 8) {
+      isHorizontalGesture.current = true
+      setDragX(distanceX)
     }
-
-    onSkip?.()
   }
+
+  function finishSwipe(direction: 'left' | 'right') {
+    const exitDistance =
+      Math.max(window.innerWidth, document.documentElement.clientWidth) * 1.2
+
+    setIsExiting(true)
+    setIsDragging(false)
+    setDragX(direction === 'right' ? exitDistance : -exitDistance)
+
+    window.setTimeout(() => {
+      if (direction === 'right') {
+        onFavorite?.()
+      } else {
+        onSkip?.()
+      }
+    }, exitAnimationDuration)
+  }
+
+  function handlePointerEnd() {
+    if (!pointerStart.current || isPreview || isExiting) return
+
+    pointerStart.current = null
+    isHorizontalGesture.current = false
+    setIsDragging(false)
+
+    if (Math.abs(dragX) >= swipeThreshold) {
+      finishSwipe(dragX > 0 ? 'right' : 'left')
+      return
+    }
+
+    setDragX(0)
+  }
+
+  const rotation = Math.max(-10, Math.min(10, dragX / 24))
+  const actionOpacity = Math.min(1, Math.abs(dragX) / swipeThreshold)
+  const cardId = `${pet.id}-${isPreview ? 'preview' : 'current'}`
 
   return (
     <article
-      className="pet-card"
-      onTouchStart={handleTouchStart}
-      onTouchEnd={handleTouchEnd}
+      className={[
+        'pet-card',
+        isPreview ? 'pet-card--preview' : 'pet-card--active',
+        isDragging ? 'is-dragging' : '',
+        isExiting ? 'is-exiting' : '',
+      ]
+        .filter(Boolean)
+        .join(' ')}
+      style={
+        isPreview
+          ? undefined
+          : {
+              transform: `translateX(${dragX}px) rotate(${rotation}deg)`,
+            }
+      }
+      aria-hidden={isPreview || undefined}
+      onPointerDown={handlePointerDown}
+      onPointerMove={handlePointerMove}
+      onPointerUp={handlePointerEnd}
+      onPointerCancel={handlePointerEnd}
     >
+      {!isPreview && (
+        <>
+          <span
+            className="pet-card__swipe-label pet-card__swipe-label--skip"
+            style={{ opacity: dragX < 0 ? actionOpacity : 0 }}
+          >
+            <X aria-hidden="true" />
+            Ver depois
+          </span>
+          <span
+            className="pet-card__swipe-label pet-card__swipe-label--favorite"
+            style={{ opacity: dragX > 0 ? actionOpacity : 0 }}
+          >
+            <Heart fill="currentColor" aria-hidden="true" />
+            Favoritar
+          </span>
+        </>
+      )}
+
       <div className="pet-card__image-wrapper">
         <img
           className="pet-card__image"
           src={pet.imageUrl}
-          alt={`${pet.name}, ${pet.breed}`}
+          alt={isPreview ? '' : `${pet.name}, ${pet.breed}`}
+          draggable={false}
         />
         <span className="pet-card__organization">
           {pet.location.organization}
@@ -75,16 +160,19 @@ function PetCard({ pet, onFavorite, onSkip }: PetCardProps) {
           </span>
         </header>
 
-        <section className="pet-card__story" aria-labelledby={`story-${pet.id}`}>
-          <h3 id={`story-${pet.id}`}>A história de {pet.name}</h3>
+        <section
+          className="pet-card__story"
+          aria-labelledby={`story-${cardId}`}
+        >
+          <h3 id={`story-${cardId}`}>A história de {pet.name}</h3>
           <p>{pet.story}</p>
         </section>
 
         <section
           className="pet-card__temperament"
-          aria-labelledby={`temperament-${pet.id}`}
+          aria-labelledby={`temperament-${cardId}`}
         >
-          <h3 id={`temperament-${pet.id}`}>Temperamento</h3>
+          <h3 id={`temperament-${cardId}`}>Temperamento</h3>
           <ul>
             {pet.temperament.map((trait) => (
               <li key={trait}>{trait}</li>
