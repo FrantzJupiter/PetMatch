@@ -1,13 +1,53 @@
+import { useRef } from 'react'
 import { HeartPulse } from 'lucide-react'
 import type { Pet } from '../types/pet'
 
 interface PetCardProps {
   pet: Pet
+  onFavorite?: () => void
+  onSkip?: () => void
 }
 
-function PetCard({ pet }: PetCardProps) {
+const minimumSwipeDistance = 60
+
+function PetCard({ pet, onFavorite, onSkip }: PetCardProps) {
+  const touchStart = useRef<{ x: number; y: number } | null>(null)
+
+  function handleTouchStart(event: React.TouchEvent<HTMLElement>) {
+    const touch = event.changedTouches[0]
+    touchStart.current = { x: touch.clientX, y: touch.clientY }
+  }
+
+  function handleTouchEnd(event: React.TouchEvent<HTMLElement>) {
+    if (!touchStart.current) return
+
+    const touch = event.changedTouches[0]
+    const distanceX = touch.clientX - touchStart.current.x
+    const distanceY = touch.clientY - touchStart.current.y
+
+    touchStart.current = null
+
+    if (
+      Math.abs(distanceX) < minimumSwipeDistance ||
+      Math.abs(distanceX) <= Math.abs(distanceY)
+    ) {
+      return
+    }
+
+    if (distanceX > 0) {
+      onFavorite?.()
+      return
+    }
+
+    onSkip?.()
+  }
+
   return (
-    <article className="pet-card">
+    <article
+      className="pet-card"
+      onTouchStart={handleTouchStart}
+      onTouchEnd={handleTouchEnd}
+    >
       <div className="pet-card__image-wrapper">
         <img
           className="pet-card__image"

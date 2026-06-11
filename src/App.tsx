@@ -69,7 +69,11 @@ function App() {
               {currentPetIndex + 1} de {pets.length} animais disponíveis
             </p>
 
-            <PetCard pet={currentPet} />
+            <PetCard
+              pet={currentPet}
+              onFavorite={favoriteCurrentPet}
+              onSkip={moveCurrentPetToEnd}
+            />
 
             <div className="match-actions">
               <button
