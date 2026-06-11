@@ -27,6 +27,9 @@ continuam sob responsabilidade da ONG Bazar Pet.
 - Modelo tipado para os dados dos animais.
 - Dados simulados de cães e gatos.
 - Card responsivo para apresentação do animal em destaque.
+- Navegação circular entre os animais disponíveis.
+- Ações para recolocar animais na fila e salvá-los como favoritos.
+- Área para revisar e remover animais favoritos.
 
 Nesta etapa, os dados são locais e não existe integração com banco de dados,
 autenticação ou serviços externos.
@@ -87,6 +90,5 @@ src/
 
 ## Próximas etapas
 
-- Permitir avançar entre os pets disponíveis.
 - Exibir o perfil detalhado de cada animal.
 - Simular o fluxo de interesse em adoção.
