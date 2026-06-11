@@ -1,6 +1,10 @@
 import { Heart, Home, MessageCircle } from 'lucide-react'
+import PetCard from './components/PetCard'
+import { pets } from './data/pets'
 
 function App() {
+  const featuredPet = pets[0]
+
   return (
     <div className="app-shell">
       <header className="app-header">
@@ -24,6 +28,12 @@ function App() {
           <h1>Descubra seu novo amigo</h1>
           <p>Conheça histórias de animais que estão esperando por um lar.</p>
         </section>
+
+        <p className="discovery-count">
+          1 de {pets.length} animais disponíveis
+        </p>
+
+        <PetCard pet={featuredPet} />
       </main>
 
       <nav className="bottom-navigation" aria-label="Navegação principal">

@@ -146,6 +146,131 @@ svg {
   line-height: 1.6;
 }
 
+.discovery-count {
+  margin: 28px 0 16px;
+  color: var(--color-text-muted);
+  text-align: center;
+}
+
+.pet-card {
+  width: min(100%, 860px);
+  margin: 0 auto;
+  overflow: hidden;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  box-shadow: 0 18px 50px rgb(41 50 56 / 10%);
+}
+
+.pet-card__image-wrapper {
+  position: relative;
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+  background: var(--color-border);
+}
+
+.pet-card__image {
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: cover;
+}
+
+.pet-card__organization {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  padding: 9px 14px;
+  color: var(--color-surface);
+  background: rgb(64 86 96 / 88%);
+  border-radius: 6px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  backdrop-filter: blur(6px);
+}
+
+.pet-card__content {
+  display: grid;
+  gap: 28px;
+  padding: 28px 32px 32px;
+}
+
+.pet-card__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 24px;
+}
+
+.pet-card__species {
+  margin: 0 0 4px;
+  color: var(--color-primary);
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.pet-card__header h2 {
+  margin: 0;
+  font-size: 2rem;
+  line-height: 1.15;
+}
+
+.pet-card__summary {
+  margin: 8px 0 0;
+  color: var(--color-text-muted);
+  line-height: 1.5;
+}
+
+.pet-card__health {
+  max-width: 210px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 12px;
+  color: #2f6f58;
+  background: #edf7f1;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.pet-card__health svg {
+  width: 18px;
+  height: 18px;
+  flex: 0 0 auto;
+}
+
+.pet-card__story h3,
+.pet-card__temperament h3 {
+  margin: 0 0 10px;
+  font-size: 1.1rem;
+}
+
+.pet-card__story p {
+  margin: 0;
+  color: #3f4a52;
+  line-height: 1.7;
+}
+
+.pet-card__temperament ul {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.pet-card__temperament li {
+  padding: 8px 13px;
+  color: #7a3e1f;
+  background: var(--color-primary-soft);
+  border: 1px solid #ffd9c2;
+  border-radius: 6px;
+  font-size: 0.9rem;
+}
+
 .bottom-navigation {
   position: sticky;
   bottom: 0;
@@ -220,7 +345,38 @@ svg {
   }
 
   .app-content {
-    padding-top: 40px;
+    padding: 40px 0 100px;
+  }
+
+  .discovery-count {
+    margin-top: 24px;
+  }
+
+  .pet-card__image-wrapper {
+    aspect-ratio: 4 / 3;
+  }
+
+  .pet-card__organization {
+    top: 14px;
+    left: 14px;
+  }
+
+  .pet-card__content {
+    gap: 24px;
+    padding: 24px 20px;
+  }
+
+  .pet-card__header {
+    display: grid;
+    gap: 16px;
+  }
+
+  .pet-card__header h2 {
+    font-size: 1.75rem;
+  }
+
+  .pet-card__health {
+    max-width: 100%;
   }
 
   .bottom-navigation {
